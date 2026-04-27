@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>杏和成长日记</title>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#CC9900;--primary2:#E6B800;--primary3:#FFD700;/* 黄色系 */
+  --blue:#1890ff;
+  --bg:#ffffff;--card:#ffffff;--border:#eee;
+  --text:#333;--sub:#777;--danger:#ff4d4f;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);min-height:100vh;padding-bottom:40px;}
+
+/* ─── 登录页 ─── */
+#loginPage{display:flex;flex-direction:column;min-height:100vh;background:#fff;}
+.login-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px 24px;color:var(--primary);}
+.login-logo{font-size:52px;margin-bottom:12px;}
+.login-title{font-size:26px;font-weight:800;letter-spacing:1px;color:var(--primary);}
+.login-sub{font-size:16px;color:var(--primary);margin-top:6px;font-family:'Ma Shan Zheng', cursive;letter-spacing:2px;}
+.login-card{background:#fff;border-radius:22px 22px 0 0;padding:28px 24px 40px;box-shadow:0 -4px 24px rgba(0,0,0,.12);}
+.login-field{margin-bottom:14px;}
+.login-field label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:600;}
+.login-field input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;outline:none;transition:border-color .2s;}
+.login-field input:focus{border-color:var(--primary2);}
+.login-btn{width:100%;padding:14px;border-radius:11px;border:none;background:linear-gradient(90deg,var(--primary),var(--primary2));color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin-top:8px;transition:opacity .15s;}
+.login-btn:active{opacity:.85;}
+
+/* ─── 主界面（登录后） ─── */
+#mainPage{display:none;}
+
+/* 顶栏 */
+.header{background:#fff;color:var(--primary);padding:18px 16px 14px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.header-row{display:flex;justify-content:space-between;align-items:center;}
+.header h1{font-size:18px;font-weight:700;letter-spacing:.5px;}
+.header .sub{font-size:12px;opacity:.8;margin-top:3px;}
+.tab-switch{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,.35);margin-top:12px;}
+.tab-btn{flex:1;padding:7px 0;font-size:13px;font-weight:600;color:var(--sub);background:transparent;border:none;cursor:pointer;transition:background .15s,color .15s;}
+.tab-btn.active{background:var(--primary);color:#fff;}
+
+/* 通用卡片 */
+.card{background:var(--card);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin:14px 14px 0;overflow:hidden;}
+.card-title{font-size:15px;font-weight:700;color:var(--primary);padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+
+/* 表单区 */
+.form-group{padding:12px 16px;}
+.form-label{font-size:13px;color:var(--sub);margin-bottom:6px;display:block;}
+.form-input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;font-size:15px;outline:none;transition:border-color .2s;background:#fff;color:var(--text);}
+.form-input:focus{border-color:var(--primary2);}
+textarea.form-input{resize:none;min-height:90px;line-height:1.6;}
+
+/* 照片区 */
+.photo-section{padding:12px 16px;}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.photo-item{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:#f0f0f0;}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:14px;line-height:22px;text-align:center;cursor:pointer;border:none;}
+.photo-add{aspect-ratio:1;border-radius:9px;border:2px dashed #cdd4de;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;background:#fafcfe;-webkit-tap-highlight-color:transparent;}
+.photo-add span:first-child{font-size:28px;}
+.photo-add span:last-child{font-size:12px;color:var(--sub);}
+.photo-count{font-size:12px;color:var(--sub);text-align:right;}
+
+/* 提交按钮 */
+.submit-wrap{padding:14px 16px;}
+.submit-btn{width:100%;padding:14px;border-radius:11px;border:none;background:linear-gradient(90deg,var(--primary),var(--primary2));color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;}
+.submit-btn:active{opacity:.85;}
+
+/* 记录列表 */
+.records-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 4px;}
+.records-bar span{font-size:15px;font-weight:700;}
+.export-btn{background:var(--primary2);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;}
+
+.record-card{margin:0 14px 12px;background:var(--card);border-radius:13px;box-shadow:0 2px 8px rgba(0,0,0,.07);overflow:hidden;}
+.record-head{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);}
+.record-name-badge{background:#FFF8E7;color:var(--primary);font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.record-admin-badge{background:#fff3e0;color:#e67e00;font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;border:1.5px solid #ffe0a0;}
+.record-time{font-size:12px;color:var(--sub);}
+.record-body{padding:11px 14px;}
+.record-content{font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-all;}
+.record-photos{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+.record-photos img{width:72px;height:72px;border-radius:7px;object-fit:cover;cursor:pointer;}
+
+.empty-tip{text-align:center;color:#c0c8d0;font-size:14px;padding:32px 0;}
+.date-divider{font-size:12px;color:var(--sub);padding:10px 16px 4px;font-weight:600;}
+
+/* 相机弹窗 */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end;justify-content:center;}
+.overlay.active{display:flex;}
+.cam-modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:18px 18px 34px;animation:slideUp .22s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cam-title{font-size:16px;font-weight:700;text-align:center;color:var(--text);margin-bottom:14px;}
+#videoWrap{position:relative;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#000;margin-bottom:12px;}
+#video{width:100%;height:100%;object-fit:cover;display:block;}
+#wmOverlay{position:absolute;bottom:10px;left:10px;right:10px;display:flex;flex-direction:column;gap:3px;pointer-events:none;}
+.wm{display:inline-block;background:rgba(0,0,0,.56);color:#fff;font-size:13px;padding:2px 8px;border-radius:4px;width:fit-content;}
+#previewWrap{display:none;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#000;margin-bottom:12px;}
+#previewWrap img{width:100%;height:100%;object-fit:cover;}
+canvas{display:none;}
+.cam-btns{display:flex;gap:9px;position:relative;z-index:10;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.cam-btns button{flex:1;padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;position:relative;z-index:10;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;}
+#btnCapture{background:var(--primary2);color:#fff;}
+#btnRetake{background:#f0f0f0;color:#555;display:none;}
+#btnUse{background:var(--blue);color:#fff;display:none;}
+#btnCamCancel{background:#f5f5f5;color:#888;flex:0 0 auto;width:72px;}
+
+/* 大图预览 */
+.img-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center;}
+.img-overlay.active{display:flex;}
+.img-overlay img{max-width:94vw;max-height:90vh;border-radius:10px;object-fit:contain;}
+.img-overlay-close{position:absolute;top:18px;right:18px;font-size:28px;color:#fff;cursor:pointer;line-height:1;}
+
+/* Toast */
+#toast{display:none;position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);color:#fff;font-size:14px;padding:10px 22px;border-radius:24px;z-index:999;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<!-- ══════════ 登录页 ══════════ -->
+<div id="loginPage">
+  <div class="login-top">
+    <img src="logo.jpg" class="login-logo" alt="logo" style="width:64px;height:64px;object-fit:contain;border-radius:12px;">
+    <div class="login-title">杏和成长日记</div>
+    <div class="login-sub">记录每一天的成长足迹</div>
+  </div>
+
+  <div class="login-card">
+    <div class="login-field">
+      <label>您的姓名</label>
+      <input type="text" id="loginName" placeholder="请输入姓名" maxlength="10" autocomplete="off"/>
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">进入</button>
+  </div>
+</div>
+
+<!-- ══════════ 主界面 ══════════ -->
+<div id="mainPage">
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1><img src="logo.jpg" style="width:28px;height:28px;vertical-align:middle;margin-right:6px;"> 杏和成长日记</h1>
+        <div class="sub" id="headerDate"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="userBadge" style="font-size:13px;font-weight:600;color:var(--primary);"></span>
+      </div>
+    </div>
+    <div class="tab-switch">
+      <button class="tab-btn active" id="tabWrite" onclick="switchTab('write')">✏️ 写日记</button>
+      <button class="tab-btn" id="tabHistory" onclick="switchTab('history')">📂 历史记录</button>
+    </div>
+  </div>
+
+  <!-- ══════ 写日记页 ══════ -->
+  <div id="pageWrite">
+
+    <!-- 工作内容 -->
+    <div class="card">
+      <div class="card-title" id="writeCardTitle">📝 今日日记</div>
+      <div class="form-group">
+        <label class="form-label">记录今天做了什么（可多行）</label>
+        <textarea class="form-input" id="workContent" placeholder="例如：上午接诊患者8人，下午完成针灸操作5例…" rows="5"></textarea>
+      </div>
+    </div>
+
+    <!-- 照片 -->
+    <div class="card">
+      <div class="card-title">📷 添加照片（带水印）</div>
+      <div class="photo-section">
+        <div class="photo-grid" id="photoGrid">
+          <div class="photo-add" onclick="openCamera()">
+            <span>📷</span>
+            <span>拍照</span>
+          </div>
+        </div>
+        <div class="photo-count" id="photoCount">已添加 0 张，最多 9 张</div>
+      </div>
+    </div>
+
+    <!-- 提交 -->
+    <div class="card">
+      <div class="submit-wrap">
+        <button class="submit-btn" onclick="submitReport()">提交日记</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════ 历史页 ══════ -->
+  <div id="pageHistory" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 4px;">
+      <span style="font-size:15px;font-weight:700;" id="historyTitle">我的记录</span>
+      <button class="export-btn" onclick="exportCSV()">导出本月 CSV</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- ══════════ 相机弹窗 ══════════ -->
+<div class="overlay" id="camOverlay">
+  <div class="cam-modal">
+    <div class="cam-title">拍摄工作照片</div>
+    <div id="videoWrap">
+      <video id="video" autoplay playsinline muted></video>
+      <div id="wmOverlay">
+        <span class="wm" id="wmName">—</span>
+        <span class="wm" id="wmTime">—</span>
+        <span class="wm">杏和门诊部</span>
+      </div>
+    </div>
+    <div id="previewWrap"><img id="previewImg" src="" alt=""/></div>
+    <canvas id="canvas"></canvas>
+    <div class="cam-btns">
+      <button id="btnCamCancel" onclick="closeCamera()">取消</button>
+      <button id="btnCapture"   onclick="capture()">📷 拍照</button>
+      <button id="btnRetake"    onclick="retake()">重拍</button>
+      <button id="btnUse"       onclick="usePhoto()">✅ 使用</button>
+    </div>
+  </div>
+</div>
+
+<!-- 大图预览 -->
+<div class="img-overlay" id="imgOverlay" onclick="closeImgOverlay()">
+  <span class="img-overlay-close">✕</span>
+  <img id="imgOverlayImg" src="" alt=""/>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// 基础工具（必须放在最前面）
+// ═══════════════════════════════════════
+const padZ = n => String(n).padStart(2,'0');
+function nowStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${padZ(d.getMonth()+1)}-${padZ(d.getDate())} ${padZ(d.getHours())}:${padZ(d.getMinutes())}:${padZ(d.getSeconds())}`;
+}
+function todayStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${padZ(d.getMonth()+1)}-${padZ(d.getDate())}`;
+}
+function monthStr(){
+  const d=new Date();
+  return `${d.getFullYear()}-${padZ(d.getMonth()+1)}`;
+}
+function showToast(msg,dur=2200){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',dur);
+}
+
+// ═══════════════════════════════════════
+// 登录模式
+// ═══════════════════════════════════════
+let currentUser = localStorage.getItem('currentUser') || '';
+let isAdmin = localStorage.getItem('isAdmin') === '1';
+let photos = [];
+let capturedDataUrl = null;
+let cameraStream = null;
+let wmTimer = null;
+
+// ═══════════════════════════════════════
+// 初始化
+// ═══════════════════════════════════════
+document.getElementById('headerDate').textContent =
+  todayStr() + ' 星期' + '日一二三四五六'[new Date().getDay()];
+
+function doLogin(){
+  const name = document.getElementById('loginName').value.trim();
+  if(!name){ showToast('请输入姓名'); return; }
+
+  if(name === 'xh5115'){
+    currentUser = '管理员';
+    isAdmin = true;
+    localStorage.setItem('currentUser', '管理员');
+    localStorage.setItem('isAdmin', '1');
+  } else {
+    currentUser = name;
+    isAdmin = false;
+    localStorage.setItem('currentUser', name);
+    localStorage.setItem('isAdmin', '0');
+    localStorage.setItem('lastEmployeeName', name);
+  }
+  enterMain();
+}
+
+function enterMain(){
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('mainPage').style.display  = 'block';
+
+  // 清理可能残留的退出按钮
+  document.querySelectorAll('.header-logout-btn').forEach(b=>b.remove());
+
+  // 用户徽章
+  const badge = document.getElementById('userBadge');
+  if(isAdmin){
+    badge.textContent = '🔐 管理员';
+    badge.style.color = 'var(--primary)';
+  } else {
+    badge.textContent = '🌱 ' + currentUser;
+    badge.style.color = 'var(--primary)';
+  }
+
+  // 历史标题
+  document.getElementById('historyTitle').textContent = isAdmin ? '全员记录（管理员视图）' : '我的记录';
+  document.getElementById('writeCardTitle').textContent = isAdmin ? '📝 管理员备注' : '📝 今日日记';
+
+  // 管理员隐藏提交功能（只查看）
+  if(isAdmin){
+    document.getElementById('pageWrite').style.display = 'none';
+    switchTab('history');
+    document.getElementById('tabWrite').style.display  = 'none';
+    document.getElementById('tabHistory').style.display = 'block';
+    // 给管理员加个"返回"的入口在badge旁
+    const headerRight = document.querySelector('.header .header-row > div:last-child');
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = '退出';
+    logoutBtn.style.cssText = 'background:var(--primary);color:#fff;border:none;border-radius:7px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+    logoutBtn.className = 'header-logout-btn';
+    logoutBtn.onclick = doLogout;
+    headerRight.appendChild(logoutBtn);
+  } else {
+    document.getElementById('tabWrite').style.display  = 'block';
+    document.getElementById('tabHistory').style.display = 'block';
+    switchTab('write');
+    const headerRight = document.querySelector('.header .header-row > div:last-child');
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = '切换账号';
+    logoutBtn.style.cssText = 'background:var(--primary);color:#fff;border:none;border-radius:7px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;';
+    logoutBtn.className = 'header-logout-btn';
+    logoutBtn.onclick = doLogout;
+    headerRight.appendChild(logoutBtn);
+  }
+}
+
+function doLogout(){
+  currentUser = '';
+  isAdmin = false;
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('isAdmin');
+  document.querySelectorAll('.header-logout-btn').forEach(b=>b.remove());
+  document.getElementById('mainPage').style.display  = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginName').value = '';
+  photos = [];
+  renderPhotoGrid();
+  document.getElementById('workContent').value = '';
+}
+
+// 页面加载时：已登录则直接进入
+// 页面加载时：已登录则直接进入主页面
+currentUser = localStorage.getItem('currentUser') || '';
+isAdmin = localStorage.getItem('isAdmin') === '1';
+if(currentUser){
+  setTimeout(enterMain, 50);
+}
+
+// ═══════════════════════════════════════
+// Tab 切换
+// ═══════════════════════════════════════
+function switchTab(tab){
+  if(isAdmin && tab==='write'){ showToast('管理员请查看历史记录'); return; }
+  document.getElementById('pageWrite').style.display   = tab==='write'  ?'block':'none';
+  document.getElementById('pageHistory').style.display = tab==='history'?'block':'none';
+  document.getElementById('tabWrite').classList.toggle('active',  tab==='write');
+  document.getElementById('tabHistory').classList.toggle('active',tab==='history');
+  if(tab==='history') renderHistory();
+}
+
+// ═══════════════════════════════════════
+// 照片管理
+// ═══════════════════════════════════════
+function renderPhotoGrid(){
+  const grid = document.getElementById('photoGrid');
+  const items = photos.map((p,i)=>`
+    <div class="photo-item">
+      <img src="${p}" onclick="viewImg('${p}')"/>
+      <button class="photo-del" onclick="removePhoto(${i})">✕</button>
+    </div>
+  `).join('');
+  const addBtn = photos.length<9 && !isAdmin
+    ? `<div class="photo-add" onclick="openCamera()"><span>📷</span><span>拍照</span></div>` : '';
+  grid.innerHTML = items + addBtn;
+  document.getElementById('photoCount').textContent = `已添加 ${photos.length} 张，最多 9 张`;
+}
+
+function removePhoto(idx){
+  photos.splice(idx,1);
+  renderPhotoGrid();
+}
+
+function viewImg(src){
+  document.getElementById('imgOverlayImg').src = src;
+  document.getElementById('imgOverlay').classList.add('active');
+}
+function closeImgOverlay(){
+  document.getElementById('imgOverlay').classList.remove('active');
+}
+
+// ═══════════════════════════════════════
+// 相机
+// ═══════════════════════════════════════
+async function openCamera(){
+  if(isAdmin){ showToast('管理员账号无法提交'); return; }
+  if(photos.length>=9){ showToast('最多添加 9 张照片'); return; }
+  capturedDataUrl = null;
+
+  document.getElementById('videoWrap').style.display  = 'block';
+  document.getElementById('previewWrap').style.display= 'none';
+  document.getElementById('btnCapture').style.display = 'block';
+  document.getElementById('btnRetake').style.display  = 'none';
+  document.getElementById('btnUse').style.display     = 'none';
+  document.getElementById('camOverlay').classList.add('active');
+
+  try{
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}},
+      audio:false
+    });
+    const videoEl = document.getElementById('video');
+    videoEl.srcObject = cameraStream;
+    // 视频加载后更新水印
+    videoEl.onloadedmetadata = function(){
+      updateWm();
+      wmTimer = setInterval(updateWm, 1000);
+    };
+    // 备用：如果 onloadedmetadata 不触发，1秒后也执行
+    setTimeout(()=>{
+      if(!wmTimer){
+        updateWm();
+        wmTimer = setInterval(updateWm, 1000);
+      }
+    }, 1000);
+  }catch(e){
+    showToast('无法打开摄像头，请检查权限');
+    closeCamera(); return;
+  }
+}
+
+function updateWm(){
+  const wmNameEl = document.getElementById('wmName');
+  const wmTimeEl = document.getElementById('wmTime');
+  if(wmNameEl) wmNameEl.textContent = currentUser || '未登录';
+  if(wmTimeEl) wmTimeEl.textContent = new Date().toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replace(/\//g,'-');
+}
+
+function closeCamera(){
+  if(cameraStream){ cameraStream.getTracks().forEach(t=>t.stop()); cameraStream=null; }
+  clearInterval(wmTimer);
+  document.getElementById('camOverlay').classList.remove('active');
+}
+
+function capture(){
+  const video  = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const ctx    = canvas.getContext('2d');
+
+  canvas.width  = video.videoWidth  || 1280;
+  canvas.height = video.videoHeight || 960;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const lines = [currentUser || '未登录', nowStr(), '杏和门诊部'];
+  const fSize    = Math.round(canvas.height * 0.029);
+  const padding  = Math.round(fSize * 0.45);
+  const lineH    = fSize + padding * 2 + 4;
+  const startY   = canvas.height - lines.length * lineH - 16;
+
+  ctx.font = `bold ${fSize}px PingFang SC, Arial`;
+
+  lines.forEach((line,i)=>{
+    const w  = ctx.measureText(line).width + padding*2;
+    const bx = 16, by = startY + i*(lineH+6);
+    ctx.fillStyle = 'rgba(0,0,0,0.56)';
+    roundRect(ctx,bx,by,w,lineH,6); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(line, bx+padding, by+fSize+padding*0.8);
+  });
+
+  capturedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+  document.getElementById('previewImg').src         = capturedDataUrl;
+  document.getElementById('previewWrap').style.display = 'block';
+  document.getElementById('videoWrap').style.display   = 'none';
+  document.getElementById('btnCapture').style.display  = 'none';
+  document.getElementById('btnRetake').style.display   = 'block';
+  document.getElementById('btnUse').style.display      = 'block';
+  clearInterval(wmTimer);
+}
+
+function retake(){
+  capturedDataUrl = null;
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('videoWrap').style.display   = 'block';
+  document.getElementById('btnCapture').style.display  = 'block';
+  document.getElementById('btnRetake').style.display   = 'none';
+  document.getElementById('btnUse').style.display      = 'none';
+  updateWm();
+  wmTimer = setInterval(updateWm, 1000);
+}
+
+function usePhoto(){
+  if(!capturedDataUrl) return;
+  photos.push(capturedDataUrl);
+  renderPhotoGrid();
+  closeCamera();
+  showToast('照片已添加 ✅');
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+// ═══════════════════════════════════════
+// 提交日记
+// ═══════════════════════════════════════
+function submitReport(){
+  if(isAdmin){ showToast('管理员账号无法提交'); return; }
+  if(!currentUser){ showToast('请先登录'); return; }
+  const content = document.getElementById('workContent').value.trim();
+  if(!content){ showToast('请填写日记内容 📝'); return; }
+
+  const record = {
+    id:      Date.now(),
+    name:    currentUser,
+    content: content,
+    photos:  photos.slice(),
+    time:    nowStr(),
+    date:    todayStr(),
+    month:   monthStr(),
+    isAdmin: false
+  };
+
+  const all = JSON.parse(localStorage.getItem('workReports')||'[]');
+  all.push(record);
+  localStorage.setItem('workReports', JSON.stringify(all));
+
+  document.getElementById('workContent').value = '';
+  photos = [];
+  renderPhotoGrid();
+
+  showToast('今天辛苦啦！ 🎉');
+}
+
+// ═══════════════════════════════════════
+// 历史记录渲染
+// ═══════════════════════════════════════
+function renderHistory(){
+  const all = JSON.parse(localStorage.getItem('workReports')||'[]');
+
+  // 过滤：管理员看全部，员工只看自己的
+  const filtered = isAdmin ? all : all.filter(r => r.name === currentUser);
+  filtered.sort((a,b)=>b.id - a.id);
+
+  const container = document.getElementById('historyList');
+
+  if(!filtered.length){
+    container.innerHTML = '<div class="empty-tip">暂无记录' + (isAdmin ? '' : '，开始写今天的日记吧 ✨') + '</div>';
+    return;
+  }
+
+  // 按日期分组
+  const grouped = {};
+  filtered.forEach(r=>{
+    if(!grouped[r.date]) grouped[r.date]=[];
+    grouped[r.date].push(r);
+  });
+
+  let html = '';
+  Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).forEach(date=>{
+    const count = grouped[date].length;
+    html += `<div class="date-divider">📅 ${date} 星期${'日一二三四五六'[new Date(date).getDay()]} <span style="font-weight:normal;font-size:11px;color:#aaa;margin-left:8px;">共${count}条</span></div>`;
+    grouped[date].forEach(r=>{
+      const photos = (r.photos||[]).map(src=>
+        `<img src="${src}" onclick="viewImg('${src}')" />`
+      ).join('');
+      const badgeClass = r.isAdmin ? 'record-admin-badge' : 'record-name-badge';
+      html += `
+        <div class="record-card">
+          <div class="record-head">
+            <span class="${badgeClass}">${r.name}</span>
+            <span class="record-time">${r.time.split(' ')[1]}</span>
+          </div>
+          <div class="record-body">
+            <div class="record-content">${escHtml(r.content)}</div>
+            ${photos ? `<div class="record-photos">${photos}</div>` : ''}
+          </div>
+        </div>`;
+    });
+  });
+
+  container.innerHTML = html;
+}
+
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════
+// 导出 CSV（含照片ZIP）
+// ═══════════════════════════════════════
+function exportCSV(){
+  const all   = JSON.parse(localStorage.getItem('workReports')||'[]');
+  const month = monthStr();
+  const rows  = isAdmin ? all.filter(r=>r.month===month) : all.filter(r=>r.month===month && r.name===currentUser);
+
+  if(!rows.length){ showToast('本月暂无记录'); return; }
+
+  const csvLines = ['姓名,日期,时间,内容,照片数'];
+  rows.forEach(r=>{
+    csvLines.push(`"${r.name}","${r.date}","${r.time.split(' ')[1]}","${r.content.replace(/"/g,'""')}",${(r.photos||[]).length}`);
+  });
+
+  const blob = new Blob(['\uFEFF'+csvLines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`杏和成长日记_${month}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${rows.length} 条记录`);
+}
+
+</script>
+
+</body>
+</html>
