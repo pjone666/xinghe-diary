@@ -366,8 +366,20 @@
 
 <div class="footer">杏和成长日记 v2 · 企业微信版</div>
 
-<script src="https://cloudcapiv1.nicelinks.work/6.2.3/tcb.js"></script>
+<script src="tcb.js"></script>
 <script>
+// TCB 加载超时保护
+window.__tcbReady = false;
+window.__tcbTimeout = false;
+setTimeout(() => {
+  if (!window.__tcbReady) {
+    window.__tcbTimeout = true;
+    // 隐藏加载页，显示登录
+    document.getElementById('loadingPage').style.display = 'none';
+    document.getElementById('loginPage').classList.add('active');
+    console.warn('TCB加载超时，使用降级模式');
+  }
+}, 5000);
 // ==================== 配置区 ====================
 const WXWORK_CORPID = 'ww2d2913dc4a58976d';
 const WXWORK_AGENTID = '1000007';
@@ -380,8 +392,12 @@ let historySkip = 0;
 const PAGE_SIZE = 20;
 
 // ==================== TCB 初始化 ====================
-const app = tcb.init({ env: DB_ENV_ID });
-const db = app.database();
+let app, db;
+if (typeof tcb !== 'undefined') {
+  app = tcb.init({ env: DB_ENV_ID });
+  db = app.database();
+  window.__tcbReady = true;
+}
 
 // ==================== 工具函数 ====================
 function toast(msg) {
