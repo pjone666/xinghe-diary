@@ -670,7 +670,6 @@ function showMainApp() {
   document.getElementById('loadingPage').style.display = 'none';
   document.getElementById('loginPage').classList.remove('active');
   document.getElementById('tabBar').classList.add('visible');
-  document.getElementById('submitPage').classList.add('active');
 
   document.getElementById('myName').textContent = currentUser.name;
   document.getElementById('myDept').textContent = currentUser.dept || '未设置';
@@ -678,6 +677,17 @@ function showMainApp() {
 
   document.getElementById('headerSub').textContent =
     (currentUser.isAdmin ? '👑 ' : '') + currentUser.name + (currentUser.dept ? ' · ' + currentUser.dept : '');
+
+  // 管理员：隐藏写日记页，直接切换到历史页面
+  if (currentUser.isAdmin) {
+    document.getElementById('submitPage').classList.remove('active');
+    document.getElementById('historyPage').classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="history"]').classList.add('active');
+    loadHistory(true);
+  } else {
+    document.getElementById('submitPage').classList.add('active');
+  }
 }
 
 // ==================== 标签切换 ====================
@@ -731,6 +741,7 @@ function removePhoto() {
 // ==================== 提交日记 ====================
 document.getElementById('submitBtn').addEventListener('click', async () => {
   if (!currentUser) { toast('请先登录'); return; }
+  if (currentUser.isAdmin) { toast('管理员账号无法提交记录'); return; }
   const content = document.getElementById('contentInput').value.trim();
   if (!content) { toast('请输入记录内容'); return; }
 
