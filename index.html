@@ -352,7 +352,6 @@ function doLogout(){
 }
 
 // 页面加载时：已登录则直接进入
-// 页面加载时：已登录则直接进入主页面
 currentUser = localStorage.getItem('currentUser') || '';
 isAdmin = localStorage.getItem('isAdmin') === '1';
 if(currentUser){
@@ -423,12 +422,10 @@ async function openCamera(){
     });
     const videoEl = document.getElementById('video');
     videoEl.srcObject = cameraStream;
-    // 视频加载后更新水印
     videoEl.onloadedmetadata = function(){
       updateWm();
       wmTimer = setInterval(updateWm, 1000);
     };
-    // 备用：如果 onloadedmetadata 不触发，1秒后也执行
     setTimeout(()=>{
       if(!wmTimer){
         updateWm();
